@@ -45,22 +45,23 @@ body {
 }
 
 .x {
-  background-image: url('img\\X-dark.png');
+  background-color: rgb(255, 200, 200);
 }
 
-.x-active:hover {
+/* .x-active:hover {
   background-image: url('img\\X-dark.png') !important;
   background-blend-mode: overlay;
-}
-
+  } */
+  
 .o {
-  background-image: url('img\\O-dark.png');
+  background-color: rgb(200, 200, 255);
+    /* background-image: url('img\\O-dark.png'); */
 }
 
-.o-active:hover {
+/* .o-active:hover {
   background-image: url('img\\O-dark.png') !important;
   background-blend-mode: overlay;
-}
+} */
 
 .active {
   cursor: pointer;
@@ -71,4 +72,9 @@ body {
 
 .occupied {
   pointer-events: none !important;
+}
+
+.game-piece.active:hover {
+  stroke-width: 3.5;
+  cursor: pointer;
 }

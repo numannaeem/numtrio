@@ -35,7 +35,7 @@ function HomeComponent ({ setUserName }) {
           spacing={10}
         >
           <Box textAlign='center'>
-            <Typography variant="h2" color="secondary" >TIC-TAC-TOE</Typography>
+            <Typography variant="h2" color="secondary">OTRIO</Typography>
             <Typography variant="overline">Create a room or join an existing one to start playing!</Typography>
           </Box>
           <Stack spacing={1}>

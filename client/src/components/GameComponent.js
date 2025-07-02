@@ -14,6 +14,9 @@ import { io } from 'socket.io-client'
 import baseUrl from '../baseUrl'
 import { orange, grey } from '@mui/material/colors'
 import { createTheme } from '@mui/material/styles'
+import GamePieces from './GamePieces'
+import Circle from './Circle'
+
 
 function GameComponent () {
   const params = useParams()
@@ -35,8 +38,10 @@ function GameComponent () {
   const [yourTurn, setYourTurn] = useState()
   const [yourChar, setYourChar] = useState(null)
   const [winnerText, setWinnerText] = useState(null)
-  const [winningPos, setWinningPos] = useState([])
+  // const [winningPos, setWinningPos] = useState([])
   const [socket, setSocket] = useState(null)
+  const [pieces, setPieces] = useState([])
+  const [activeSize, setActiveSize] = useState(0)
 
   useEffect(() => {
     const newSocket = io(baseUrl, {
@@ -53,7 +58,7 @@ function GameComponent () {
   useEffect(() => {
     if (socket) {
       socket.on('init-game', data => {
-        setWinningPos([])
+        // setWinningPos([])
         setWaitingRestart(false)
         setPlayerLeft(false)
         setWinnerText(null)
@@ -66,6 +71,12 @@ function GameComponent () {
           setYourTurn(false)
           setYourChar('o')
         }
+        setPieces([
+          ...Array(3).fill({ size: '1', active: false }),
+          ...Array(2).fill({ size: '2', active: false }),
+          ...Array(1).fill({ size: '3', active: false })
+        ])
+        setActiveSize(0)
       })
       socket.on('player-left', () => {
         setPlayerLeft(true)
@@ -74,6 +85,13 @@ function GameComponent () {
         setGameState(data.gameState)
         if (data.nextPlayer === socket.id) {
           setYourTurn(true)
+          let minSizeOnBoard = Math.min(...data.gameState.map(piece => parseInt(piece[0])))
+          let myMaxSize = Math.max(...pieces.map(piece => piece.size))
+          if (minSizeOnBoard >= myMaxSize) {
+            // game is a draw
+            socket.emit('played', data.gameState, 'd', [])
+            setWinnerText("It's a draw 😕")
+          }
         }
       })
       socket.on('game-over', data => {
@@ -81,7 +99,7 @@ function GameComponent () {
           setWinnerText("It's a draw 😕")
           setGameState(data.finalState)
         } else if (data.winner !== socket.id) {
-          setWinningPos(data.winningPosition)
+          // setWinningPos(data.winningPosition)
           setGameState(data.finalState)
           setWinnerText('Opponent wins 😔')
         }
@@ -90,10 +108,16 @@ function GameComponent () {
   }, [socket, yourChar])
 
   const handleClick = i => {
-    if (!yourTurn) return
+    if (!yourTurn || !activeSize) return
     let newState = gameState
-    newState[i] = yourChar
+    newState[i] = `${activeSize}${yourChar}`+newState[i]
     setYourTurn(false)
+    setPieces(pieces =>
+      pieces.filter((piece, idx) =>
+        !piece.active
+      )
+    );
+    setActiveSize(0)
     setGameState(newState)
     let gameWinner = null
     let position = []
@@ -113,20 +137,27 @@ function GameComponent () {
       let b = gameState[position[1]]
       let c = gameState[position[2]]
       if (a === '' || b === '' || c === '') continue
-      if (a === b && b === c) {
+      if (a[1] === b[1] && b[1] === c[1]) {
         gameWinner = yourChar
-        setWinningPos(position)
+        // setWinningPos(position)
         break
       }
     }
-    if (gameWinner === null && !gameState.includes('')) {
-      gameWinner = 'd'
-    }    
     socket.emit('played', newState, gameWinner, position)
     if (!gameWinner) return
     setWinnerText(gameWinner === 'd' ? "It's a draw 😕" : 'You win! 🎉')
   }
 
+  const onPieceClick = (i) => {
+    setPieces(pieces =>
+      pieces.map((piece, idx) =>
+        idx === i
+          ? { ...piece, active: !piece.active }
+          : { ...piece, active: false }
+      )
+    );
+    setActiveSize(pieces[i].size);
+  };
   const restartGame = () => {
     setWaitingRestart(true)
     socket.emit('restart-game')
@@ -146,7 +177,13 @@ function GameComponent () {
             <Typography variant='h5' textAlign='center' color={orange[900]}>
               Uh-oh! Opponent has lost connection 😐
             </Typography>
-           <Typography textAlign='center' color={grey[700]} variant="subtitle1">waiting for them to rejoin</Typography>
+            <Typography
+              textAlign='center'
+              color={grey[700]}
+              variant='subtitle1'
+            >
+              waiting for them to rejoin
+            </Typography>
             <CircularProgress thickness={2} />
             <Button
               variant='outlined'
@@ -173,13 +210,20 @@ function GameComponent () {
                 <div
                   key={i}
                   onClick={() => handleClick(i)}
-                  className={`inner-box ${yourTurn &&
-                    `active ${yourChar}-active`} ${a &&
-                    'occupied'} ${winningPos.includes(i) &&
-                    'bg-green'} ${a} ${!gameState.includes('') && 'bg-yellow'}`}
-                ></div>
+                  className={`inner-box ${
+                    activeSize && `active`
+                  } ${a[0] >= activeSize && 'occupied'} ${a[1]} ${!gameState.includes('') && 'bg-yellow'}`}
+                >
+                  {a && <Circle piece={{ size: a[0], active: false }} idx={i} color={a[1] == 'x'? 'red' : 'blue'} innerCircles={
+                    a.match(/.{1,2}/g).slice(1).map((piece, idx) => ({
+                      size: piece[0],
+                      color: piece[1] == 'x' ? 'red' : 'blue'
+                    }))
+                  }/>}
+                </div>
               ))}
             </Box>
+            <GamePieces pieces={pieces} onPieceClick={onPieceClick} yourChar={yourChar} yourTurn={yourTurn}/>
             {winnerText ? (
               <LoadingButton
                 onClick={restartGame}
