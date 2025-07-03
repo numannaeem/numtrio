@@ -3,22 +3,22 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
-import { useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import baseUrl from '../baseUrl'
 import { Typography } from '@mui/material'
 import { purple } from '@mui/material/colors'
 
-function HomeComponent ({ setUserName }) {
+function HomeComponent({ setUserName }) {
   const [roomName, setRoomName] = useState('')
   // const [innerUserName, setInnerUserName] = useState('')
   const [inputLoading, setInputLoading] = useState(false)
   const [error, setError] = useState(false)
   const navigate = useNavigate()
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     setInputLoading(true)
     e.preventDefault()
-    const res = await fetch(baseUrl+'/checkRoom/'+roomName)
-    if(res.ok) {
+    const res = await fetch(baseUrl + '/checkRoom/' + roomName)
+    if (res.ok) {
       navigate('room/' + roomName)
     } else {
       setError(true)
@@ -27,16 +27,20 @@ function HomeComponent ({ setUserName }) {
   }
   return (
     <form onSubmit={handleSubmit}>
-      <Box height='100vh' bgcolor={purple[50]} >
-        <Stack
-          height='100%'
-          alignItems='center'
-          justifyContent='center'
-          spacing={10}
-        >
-          <Box textAlign='center'>
-            <Typography variant="h2" color="secondary">OTRIO</Typography>
-            <Typography variant="overline">Create a room or join an existing one to start playing!</Typography>
+      <Box height="100vh" bgcolor={purple[50]}>
+        <Stack height="100%" alignItems="center" justifyContent="center" spacing={10}>
+          <Box textAlign="center">
+            <Typography variant="h2" color="secondary">
+              OTRIO
+            </Typography>
+            <div>
+              <Typography variant="h6" fontWeight={'100'}>
+                A twist on the classic tic-tac-toe game
+              </Typography>
+            </div>
+            <Typography variant="overline" color={'grey.700'}>
+              Create a room or join an existing one to start playing!
+            </Typography>
           </Box>
           <Stack spacing={1}>
             {/* <TextField
@@ -50,18 +54,18 @@ function HomeComponent ({ setUserName }) {
               disabled={inputLoading}
               error={error}
               helperText={error && 'Room name taken!'}
-              color='secondary'
+              color="secondary"
               value={roomName}
-              onChange={e => setRoomName(e.target.value)}
-              label='Enter room name'
-              variant='outlined'
+              onChange={(e) => setRoomName(e.target.value)}
+              label="Enter room name"
+              variant="outlined"
             />
             <Button
               disabled={roomName.length === 0}
-              color='secondary'
-              type='submit'
-              variant='contained'
-              title='Join game'
+              color="secondary"
+              type="submit"
+              variant="contained"
+              title="Join game"
             >
               Join game
             </Button>

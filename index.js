@@ -12,8 +12,15 @@ app.use(cors())
 app.use(express.static(path.resolve(__dirname, './client/build')))
 
 let roomData = {}
+const MAX_TURNS = 12
 
-io.on('connection', async socket => {
+const getTurnsPlayed = (gameState) => {
+  return gameState
+    .filter((s) => s.length)
+    .map((square) => square.match(/.{1,2}/g))
+    .flat().length
+}
+io.on('connection', async (socket) => {
   let { roomName } = socket.handshake.query
   let roomSize = io.of('/').adapter.rooms.get(roomName)?.size || 0
   if (roomSize < 2) {
@@ -47,10 +54,16 @@ io.on('connection', async socket => {
         winningPosition: position
       })
       return
+    } else if (getTurnsPlayed(gameState) >= MAX_TURNS) {
+      io.in(roomName).emit('game-over', {
+        winner: 'd',
+        finalState: gameState,
+        winningPosition: position
+      })
     } else {
       roomData[roomName].gameState = gameState
       const index = roomData[roomName].players.findIndex(
-        i => i === roomData[roomName].currentPlayer
+        (i) => i === roomData[roomName].currentPlayer
       )
       roomData[roomName].currentPlayer = roomData[roomName].players[+!index]
 
@@ -79,9 +92,7 @@ io.on('connection', async socket => {
   socket.on('disconnect', () => {
     io.in(roomName).emit('player-left')
     if (roomData[roomName].players?.length === 2)
-      roomData[roomName].players = roomData[roomName].players.filter(
-        a => a !== socket.id
-      )
+      roomData[roomName].players = roomData[roomName].players.filter((a) => a !== socket.id)
     else roomData[roomName] = null
     console.log(`${socket.id} disconnected`)
   })
@@ -97,6 +108,6 @@ app.use((req, res, next) => {
   res.sendFile(path.resolve(__dirname, './client/build', 'index.html'))
 })
 
-server.listen(process.env.PORT || 5000, err => {
+server.listen(process.env.PORT || 5000, (err) => {
   if (!err) console.log('listening on *:5000')
 })
