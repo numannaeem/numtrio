@@ -17,7 +17,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   padding: 10px;
   border-radius: 20px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 16px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 16px;
 }
 
 .pieces-board {
@@ -43,37 +43,53 @@ body {
   transition: background-color 150ms;
 }
 
-.bg-green {
-  background-color: rgb(134, 243, 134);
-}
-.bg-yellow {
-  background-color: rgb(243, 236, 134);
-}
-
 .x {
   background-color: rgb(255, 200, 200);
 }
 
-/* .x-active:hover {
-  background-image: url('img\\X-dark.png') !important;
-  background-blend-mode: overlay;
-  } */
-
 .o {
   background-color: rgb(200, 200, 255);
-  /* background-image: url('img\\O-dark.png'); */
 }
 
-/* .o-active:hover {
-  background-image: url('img\\O-dark.png') !important;
-  background-blend-mode: overlay;
-} */
 
 .active {
   cursor: pointer;
 }
-.game-board .active:hover {
-  background-color: #f5f5f5;
+
+.drag-over-1 div:nth-child(1).highlight-circle-1 circle:nth-child(3),
+.drag-over-1 div:nth-child(1).highlight-circle-2 circle:nth-child(2),
+.drag-over-1 div:nth-child(1).highlight-circle-3 circle:nth-child(1),
+.drag-over-2 div:nth-child(2).highlight-circle-1 circle:nth-child(3),
+.drag-over-2 div:nth-child(2).highlight-circle-2 circle:nth-child(2),
+.drag-over-2 div:nth-child(2).highlight-circle-3 circle:nth-child(1),
+.drag-over-3 div:nth-child(3).highlight-circle-1 circle:nth-child(3),
+.drag-over-3 div:nth-child(3).highlight-circle-2 circle:nth-child(2),
+.drag-over-3 div:nth-child(3).highlight-circle-3 circle:nth-child(1),
+.drag-over-4 div:nth-child(4).highlight-circle-1 circle:nth-child(3),
+.drag-over-4 div:nth-child(4).highlight-circle-2 circle:nth-child(2),
+.drag-over-4 div:nth-child(4).highlight-circle-3 circle:nth-child(1),
+.drag-over-5 div:nth-child(5).highlight-circle-1 circle:nth-child(3),
+.drag-over-5 div:nth-child(5).highlight-circle-2 circle:nth-child(2),
+.drag-over-5 div:nth-child(5).highlight-circle-3 circle:nth-child(1),
+.drag-over-6 div:nth-child(6).highlight-circle-1 circle:nth-child(3),
+.drag-over-6 div:nth-child(6).highlight-circle-2 circle:nth-child(2),
+.drag-over-6 div:nth-child(6).highlight-circle-3 circle:nth-child(1),
+.drag-over-7 div:nth-child(7).highlight-circle-1 circle:nth-child(3),
+.drag-over-7 div:nth-child(7).highlight-circle-2 circle:nth-child(2),
+.drag-over-7 div:nth-child(7).highlight-circle-3 circle:nth-child(1),
+.drag-over-8 div:nth-child(8).highlight-circle-1 circle:nth-child(3),
+.drag-over-8 div:nth-child(8).highlight-circle-2 circle:nth-child(2),
+.drag-over-8 div:nth-child(8).highlight-circle-3 circle:nth-child(1),
+.drag-over-9 div:nth-child(9).highlight-circle-1 circle:nth-child(3),
+.drag-over-9 div:nth-child(9).highlight-circle-2 circle:nth-child(2),
+.drag-over-9 div:nth-child(9).highlight-circle-3 circle:nth-child(1) {
+  stroke: rgba(100, 100, 100, 0.9);
+}
+
+.highlight-circle-1:hover circle:nth-child(3),
+.highlight-circle-2:hover circle:nth-child(2),
+.highlight-circle-3:hover circle:nth-child(1) {
+  stroke: rgba(100, 100, 100, 0.9);
 }
 
 .occupied {
@@ -82,15 +98,14 @@ body {
 
 .game-piece.active,
 circle {
-  /* -webkit-transition : -webkit-filter 500ms linear; */
   transition:
     transform 150ms,
-    filter 150ms;
+    filter 150ms,
+    stroke 150ms;
   overflow: visible;
 }
 .game-piece.active:hover {
   transform: translate(0, -4px);
-  cursor: pointer;
 }
 .game-piece.active:hover circle {
   filter: drop-shadow(0 5px 1px rgba(0, 0, 0, 0.2));

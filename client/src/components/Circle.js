@@ -10,31 +10,32 @@ function Circle({ piece, idx, onPieceClick, color, innerCircles, yourTurn, setAc
   }
 
   const [circleBeingDragged, setCircleBeingDragged] = useState(false)
-
+  const onDragStart = (e) => {
+    e.dataTransfer.setData('pieceIndex', idx)
+    setCircleBeingDragged(true)
+    setActiveSize(piece.size)
+    onPieceClick(idx)
+    const svg = e.currentTarget.querySelector('svg')
+    if (svg) {
+      const clone = svg.cloneNode(true)
+      clone.style.position = 'absolute'
+      clone.style.top = '-1000px'
+      document.body.appendChild(clone)
+      e.dataTransfer.setDragImage(
+        clone,
+        clone.width.baseVal.value / 2,
+        clone.height.baseVal.value / 2
+      )
+      setTimeout(() => document.body.removeChild(clone), 0)
+    }
+  }
   return (
     <Box
-      draggable={yourTurn && color !== '#ccc'}
-      onDragStart={(e) => {
-        e.dataTransfer.setData('pieceIndex', idx)
-        setCircleBeingDragged(true)
-        setActiveSize(piece.size)
-        onPieceClick(idx)
-        const svg = e.currentTarget.querySelector('svg')
-        if (svg) {
-          const clone = svg.cloneNode(true)
-          clone.style.position = 'absolute'
-          clone.style.top = '-1000px'
-          document.body.appendChild(clone)
-          e.dataTransfer.setDragImage(
-            clone,
-            clone.width.baseVal.value / 2,
-            clone.height.baseVal.value / 2
-          )
-          setTimeout(() => document.body.removeChild(clone), 0)
-        }
-      }}
+      draggable={yourTurn}
+      onDragStart={onDragStart}
       onDragEnd={() => setCircleBeingDragged(false)}
       display="inline-block"
+      style={{pointerEvents: yourTurn ? 'auto' : 'none'}}
       sx={{ width: sizes[piece.size], height: sizes[piece.size], p: 0, m: 0 }}
     >
       <svg

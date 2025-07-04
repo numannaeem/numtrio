@@ -33,6 +33,7 @@ function GameComponent() {
   // const [winningPos, setWinningPos] = useState([])
   const [socket, setSocket] = useState(null)
   const [pieces, setPieces] = useState([])
+  const [dragOver, setDragOver] = useState(false);
   const [activeSize, setActiveSize] = useState(0)
 
   useEffect(() => {
@@ -151,21 +152,19 @@ function GameComponent() {
   }
 
   const drawCircles = (a, i) => {
+    let map = {}
     let circles = a.match(/.{1,2}/g)
-    let sizes = a.replace(/[x|o]/g, '').split('')
-    let all_circles = '3g2g1g'.match(/.{1,2}/g)
-    for (let size = 1; size <= 3; size++) {
-      if (sizes.includes(size.toString())) {
-        all_circles[3 - size] = `${size}${circles.find((c) => c[0] === `${size}`)[1]}`
-      }
-    }
-    circles = all_circles
+    circles.forEach((piece) => {
+      map[piece[0]] = piece
+    })
+    circles = []
+    Array(3).fill().forEach((_, size) => circles.unshift(map[size+1] || `${size+1}g`))
     return (
       <Circle
         piece={{ size: circles[0][0], active: false }}
         idx={i}
         color={circles[0][1] == 'x' ? 'red' : circles[0][1] == 'o' ? 'blue' : '#aaa6'}
-        innerCircles={circles.slice(1).map((piece, idx) => ({
+        innerCircles={circles.slice(1).map((piece) => ({
           size: piece[0],
           color: piece[1] == 'x' ? 'red' : piece[1] == 'o' ? 'blue' : '#aaa6'
         }))}
@@ -208,16 +207,17 @@ function GameComponent() {
             <Typography color={'orangered'} variant="h4">
               {winnerText || (yourTurn ? 'Your turn' : "Opponent's turn")}
             </Typography>
-            <Box className="game-board">
+            <Box className={`game-board ${dragOver && `drag-over-${dragOver}`}`}>
               {gameState.map((a, i) => (
                 <div
                   key={i}
                   onClick={() => handleClick(i)}
-                  className={`inner-box ${activeSize && `active`} ${
-                    a[0] >= activeSize && 'occupied'
-                  } ${a[1]} ${!gameState.includes('') && 'bg-yellow'}`}
+                  className={`inner-box ${activeSize && `active highlight-circle-${activeSize}`} 
+                  ${a[0] >= activeSize && 'occupied'} ${a[1]}`}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => handleClick(i)}
+                  onDragEnter={() => setDragOver(i+1)}
+                  onDragLeave={() => setDragOver(0)}
+                  onDrop={e => { setDragOver(0); handleClick(i) }}
                 >
                   {a ? (
                     drawCircles(a, i)
