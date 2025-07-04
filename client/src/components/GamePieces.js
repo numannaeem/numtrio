@@ -1,7 +1,7 @@
 import React from 'react'
 import Circle from './Circle'
 
-function GamePieces({ pieces, onPieceClick, yourChar, yourTurn }) {
+function GamePieces({ pieces, onPieceClick, yourChar, yourTurn, setActiveSize, setPieces }) {
   return (
     <div
       style={{
@@ -14,13 +14,17 @@ function GamePieces({ pieces, onPieceClick, yourChar, yourTurn }) {
       }}
     >
       {pieces.map((piece, i) => (
-        <Circle
-          piece={piece}
-          idx={i}
-          onPieceClick={onPieceClick}
-          color={yourChar == 'x' ? 'red' : 'blue'}
-          yourTurn={yourTurn}
-        />
+        <div key={i}>
+          <Circle
+            piece={piece}
+            setPieces={setPieces}
+            idx={i}
+            setActiveSize={setActiveSize}
+            onPieceClick={onPieceClick}
+            color={yourChar == 'x' ? 'red' : 'blue'}
+            yourTurn={yourTurn}
+          />
+        </div>
       ))}
     </div>
   )

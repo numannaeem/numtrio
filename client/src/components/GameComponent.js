@@ -139,15 +139,11 @@ function GameComponent() {
   const onPieceClick = (i) => {
     setPieces((pieces) =>
       pieces.map((piece, idx) =>
-        idx === i ? { ...piece, active: !piece.active } : { ...piece, active: false }
+        idx === i ? { ...piece, active: true } : { ...piece, active: false }
       )
     )
+    setActiveSize(pieces[i].size)
   }
-  useEffect(() => {
-    // Find the active piece and set its size
-    const active = pieces.find((p) => p.active)
-    setActiveSize(active ? active.size : 0)
-  }, [pieces])
 
   const restartGame = () => {
     setWaitingRestart(true)
@@ -209,10 +205,10 @@ function GameComponent() {
           </Stack>
         ) : (
           <Stack spacing={3} alignItems="center" justifyContent="center">
-            <Typography color="orangered" variant="h4">
+            <Typography color={'orangered'} variant="h4">
               {winnerText || (yourTurn ? 'Your turn' : "Opponent's turn")}
             </Typography>
-            <Box sx={{ boxShadow: 15 }} className="game-board">
+            <Box className="game-board">
               {gameState.map((a, i) => (
                 <div
                   key={i}
@@ -220,6 +216,8 @@ function GameComponent() {
                   className={`inner-box ${activeSize && `active`} ${
                     a[0] >= activeSize && 'occupied'
                   } ${a[1]} ${!gameState.includes('') && 'bg-yellow'}`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleClick(i)}
                 >
                   {a ? (
                     drawCircles(a, i)
@@ -239,20 +237,21 @@ function GameComponent() {
             </Box>
             {!winnerText && pieces.length > 0 && (
               <Stack
-                sx={{ boxShadow: 2 }}
                 gap={1}
                 className="pieces-board"
                 alignItems="center"
                 justifyContent="center"
+                bgcolor={orange[50]}
               >
                 <GamePieces
                   pieces={pieces}
                   onPieceClick={onPieceClick}
                   yourChar={yourChar}
                   yourTurn={yourTurn}
+                  setActiveSize={setActiveSize}
                 />
                 <Typography variant="subtitle3" color="grey.800">
-                  Select a circle and click on the board to place it
+                  Drag a circle onto the board to place it
                 </Typography>
               </Stack>
             )}

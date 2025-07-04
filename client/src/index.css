@@ -10,13 +10,14 @@ body {
 
 .game-board {
   backdrop-filter: blur(4px);
-  width: fit-content;
+  width: min-content;
   display: grid;
   grid-gap: 6px;
   background-color: white;
   grid-template-columns: repeat(3, 1fr);
-  padding: 20px;
+  padding: 10px;
   border-radius: 20px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 16px;
 }
 
 .pieces-board {
@@ -39,7 +40,6 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90%;
-  background-color: rgb(228, 228, 228);
   transition: background-color 150ms;
 }
 
@@ -72,15 +72,26 @@ body {
 .active {
   cursor: pointer;
 }
-.active:hover {
-  background-color: #eee;
+.game-board .active:hover {
+  background-color: #f5f5f5;
 }
 
 .occupied {
   pointer-events: none !important;
 }
 
+.game-piece.active,
+circle {
+  /* -webkit-transition : -webkit-filter 500ms linear; */
+  transition:
+    transform 150ms,
+    filter 150ms;
+  overflow: visible;
+}
 .game-piece.active:hover {
-  stroke-width: 3.5;
+  transform: translate(0, -4px);
   cursor: pointer;
+}
+.game-piece.active:hover circle {
+  filter: drop-shadow(0 5px 1px rgba(0, 0, 0, 0.2));
 }
